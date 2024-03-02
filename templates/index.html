@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Career Counseling Chat</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/101ade920c.js" crossorigin="anonymous"></script>
+
+
+
+</head>
+<body>
+    <div id="chat-window">
+        <div class="input-group">
+            <input type="text" id="user-input" placeholder="Type your message..."/>
+            <button onclick="sendMessage()">Send</button>
+        </div>
+        <div id="messages-container"></div>
+    </div>
+    <script>
+        window.addEventListener('load', function() {
+            scrollToBottom();
+        });
+        
+        function scrollToBottom() {
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+        function sendMessage() {
+            var userInput = document.getElementById('user-input').value;
+            var chatWindow = document.getElementById('chat-window')
+            var messages = document.getElementById('messages-container');
+        
+            // Create the request to the Flask backend
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/chat", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        
+            // Handle the response from the backend
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    // Parse the JSON response
+                    var response = JSON.parse(xhr.responseText);
+        
+                    // Append the user's message to the chat window
+                    var userMessageContainer = document.createElement('div');
+                    userMessageContainer.className = 'chat-message user-message-container'
+                    var userMessage = document.createElement('div');
+                    userMessage.className = 'chat-message user-message';
+                    userMessage.textContent = userInput;
+                    messages.appendChild(userMessageContainer);
+                    var userIconNameContainer = document.createElement('div');
+                    userIconNameContainer.className = 'chat-message user-message user-icon-name-container'
+                    var userIcon = document.createElement('i');
+                    userIcon.className = 'chat-message user-icon fa-regular fa-user'
+                    var userName = document.createElement('div');
+                    userName.className = 'chat-message user-message user-name'
+                    userName.textContent = 'You'
+                    userMessageContainer.appendChild(userIconNameContainer)
+                    userIconNameContainer.appendChild(userIcon);
+                    userIconNameContainer.appendChild(userName);
+                    userMessageContainer.appendChild(userMessage);
+
+
+                    // Append the AI's response to the chat window
+                    
+                    var aiMessageContainer = document.createElement('div');
+                    aiMessageContainer.className = 'chat-message ai-message-container'
+                    var aiMessage = document.createElement('div');
+                    aiMessage.className="chat-message ai-message"
+                    aiMessage.textContent = response.message;
+                    messages.appendChild(aiMessageContainer);
+                    var aiIconNameContainer = document.createElement('div');
+                    aiIconNameContainer.className = 'chat-message ai-message ai-icon-name-container'
+                    var aiIcon = document.createElement('i');
+                    aiIcon.className = "chat-message ai-icon fa-brands fa-rocketchat";
+                    var aiName = document.createElement('div');
+                    aiName.className = 'chat-message ai-message ai-name'
+                    aiName.textContent = 'AI-bot'
+                    aiMessageContainer.appendChild(aiIconNameContainer)
+                    aiIconNameContainer.appendChild(aiIcon);
+                    aiIconNameContainer.appendChild(aiName);
+                    aiMessageContainer.appendChild(aiMessage);
+                    //scroll page to show th elatest message;
+                    // Clear the input field
+                    document.getElementById('user-input').value = '';
+                    scrollToBottom();
+
+                }
+            };
+        
+            // Send the request with the user's message
+            xhr.send("message=" + encodeURIComponent(userInput));
+            scrollToBottom();
+
+        }
+    </script>
+</body>
+</html>
