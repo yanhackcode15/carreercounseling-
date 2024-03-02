@@ -42,6 +42,7 @@ def chat():
     # Sending the request to the ChatGPT API
     response = requests.post(url, headers=headers, json=data)
     # Checking if the request was successful
+    print(response)
     if response.status_code == 200:
         # Extracting the text from the response
         chat_response = response.json().get("choices", [{}])[0].get("message", "").get("content", "").strip()
@@ -49,8 +50,15 @@ def chat():
         return ({"message": chat_response})
         # return jsonify({"message": chat_response})
     else:
-        # In case of an error, return an appropriate message
-        return jsonify({"error": "Failed to fetch response from the API"})
+        #In case of an error, return an appropriate message
+        code = response.status_code
+        if code==401:
+            return ({'error':'the API key error'})
+        elif code==429:
+            return ({'error': "You exceeded the daily limit"})
+        else:
+            return ({"error": "Failed to fetch response from the API"})
+        
 
 if __name__ == '__main__':
     app.run(debug=True)
